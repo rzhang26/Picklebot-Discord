@@ -1,6 +1,6 @@
 Discord bot named "Picklebot"
 
-has the following features:
+Has the following features:
 - send daily news articles to 'pickle news' category channels via NewsAPI
   - respective channels include: pickleball competition, pickleball consumer, pickleball tech
 - sends weekly meet-up reminders via reminder channel-webhook (could also just use channel ID, but for sake of experimentation)
