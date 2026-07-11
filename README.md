@@ -8,3 +8,6 @@ has the following features:
   - datetime.today().weekday() == 5 -> 5 is Saturday
 - sends a survery (poll) private DM to remind members to attend meeting  @8:30 PM EST day prior to meeting
   - datetime.today().weekday() == 4 -> 4 is Friday
+
+runs asynchronously (should be w/ out issues, else try/except clauses are abundant and will aid w/ debugging)
+uses sqlmodel ORM & automatic validation to manage the db file 'picklebot_news_state.db'
