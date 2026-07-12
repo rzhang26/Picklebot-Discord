@@ -28,6 +28,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title='Picklebot', lifespan=lifespan)
 app.include_router(router)
 
+@app.get("/")
+async def health_check():
+    return {"status": "healthy", "bot": "Picklebot is awake"}
+
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True)
