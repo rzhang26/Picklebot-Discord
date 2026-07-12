@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 
 EASTERN_TZ = ZoneInfo('America/New_York')
 friday_time = datetime.time(hour=20, minute=30, tzinfo=EASTERN_TZ) #8:30 poll
-sat_time = datetime.time(hour=20, minute=30, tzinfo=EASTERN_TZ) #8:30 event reminder for meeting @ 9:00
+sat_time = datetime.time(hour=20, minute=30, tzinfo=EASTERN_TZ) #8:30 event reminder & creation for meeting @ 9:00
 
 class RemindersCog(commands.Cog):
     def __init__(self, bot):
@@ -126,6 +126,49 @@ class RemindersCog(commands.Cog):
 
         self.last_event_date = today
         print(f"DEBUG: Saturday event loop finished and locked for {today}")
+
+    @commands.command(name="create_event")
+    @commands.has_permissions(administrator=True)  # Restricts usage to admins/owners
+    async def create_event(self, ctx: commands.Context, title: str, date_str: str, time_str: str, *, description: str = "Picklebot meetup"):
+        """
+        Creates a custom guild event.
+        Usage: !create_event "Saturday Social" 2026-07-18 20:30 "Weekly social matches"
+        """
+        try:
+            combined_str = f"{date_str} {time_str}"
+            naive_dt = datetime.datetime.strptime(combined_str, "%Y-%m-%d %H:%M")
+            
+            local_start_time = naive_dt.replace(tzinfo=EASTERN_TZ)
+            
+            now = datetime.datetime.now(EASTERN_TZ)
+            if local_start_time < now:
+                await ctx.send("❌ Error: You cannot schedule an event in the past.")
+                return
+
+            local_end_time = local_start_time + datetime.timedelta(hours=2)
+
+            scheduled_event = await ctx.guild.create_scheduled_event(
+                name=title,
+                description=description,
+                start_time=local_start_time,
+                end_time=local_end_time,
+                entity_type=discord.EntityType.external,  
+                location="On the Court",       
+                privacy_level=discord.PrivacyLevel.guild_only
+            )
+
+            await ctx.send(f"✅ **Event Created Successfully!**\nJoin here: {scheduled_event.url}")
+
+        except ValueError:
+            await ctx.send("❌ **Invalid Format.** Use: `!create_event \"Title\" YYYY-MM-DD HH:MM \"Description\"` (e.g., `2026-07-18 20:30`)")
+        except Exception as e:
+            await ctx.send(f"❌ An unexpected error occurred: {str(e)}")
+
+    @create_event.error
+    async def create_event_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("⛔ You do not have permission to use this command. Admins only.")
+
 
     @friday_dm_and_poll_loop.error
     async def friday_error(self, error):
