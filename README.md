@@ -11,3 +11,6 @@ Has the following features:
 
 runs asynchronously (should be w/ out issues, else try/except clauses are abundant and will aid w/ debugging)
 uses sqlmodel ORM & automatic validation to manage the db file 'picklebot_news_state.db'
+
+deployed on render
+pinged via uptimerobot
